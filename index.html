@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Myofunctional Therapy Quiz | Airway Clinic Stockholm</title>
+<meta name="description" content="Take this 60-second quiz to find out if myofunctional therapy could help you or your child breathe, sleep, and feel better.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#0d9488;--teal-dark:#0f766e;--teal-light:#14b8a6;
+  --navy:#0f172a;--navy-light:#1e293b;
+  --cream:#fefce8;--cream-dark:#fef9c3;
+  --white:#ffffff;--grey:#64748b;--grey-light:#f1f5f9;
+  --radius:16px;--radius-sm:10px;
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+
+/* Progress bar */
+.progress-bar{position:fixed;top:0;left:0;width:100%;height:4px;background:rgba(255,255,255,.15);z-index:100}
+.progress-bar .fill{height:100%;background:var(--teal-light);transition:width .4s ease;border-radius:0 2px 2px 0}
+
+/* Card system */
+.funnel{height:100vh;width:100vw;overflow:hidden;position:relative}
+.card{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,20px) + 16px) 24px calc(env(safe-area-inset-bottom,20px) + 48px);
+  transform:translateX(100%);transition:transform .45s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.card.active{transform:translateX(0)}
+.card.prev{transform:translateX(-100%)}
+
+/* Dot indicators */
+.dots{position:fixed;bottom:max(env(safe-area-inset-bottom,16px),20px);left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s}
+.dot.active{background:var(--teal-light);width:24px;border-radius:4px}
+
+/* Navigation arrows */
+.nav-arrow{
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  z-index:90;transition:all .2s;
+}
+.nav-arrow:hover{background:rgba(255,255,255,.2)}
+.nav-arrow.disabled{opacity:.2;pointer-events:none}
+.nav-arrow.left{left:12px}
+.nav-arrow.right{right:12px}
+
+/* Typography */
+.eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;opacity:.7;margin-bottom:12px}
+.headline{font-size:28px;font-weight:700;line-height:1.25;text-align:center;margin-bottom:12px;max-width:360px}
+.subtext{font-size:16px;line-height:1.6;text-align:center;max-width:340px;opacity:.8}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:16px 32px;border-radius:var(--radius-sm);
+  font-size:16px;font-weight:600;cursor:pointer;
+  border:none;transition:all .2s;text-decoration:none;
+  min-height:52px;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-dark)}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.25)}
+.btn-outline:hover{border-color:rgba(255,255,255,.5)}
+.btn-white{background:#fff;color:var(--navy)}
+.btn-white:hover{opacity:.9}
+.btn-call{background:var(--teal);color:#fff;display:flex;flex-direction:column;gap:2px;padding:14px 28px}
+.btn-call small{font-size:12px;font-weight:400;opacity:.8}
+
+/* Option cards */
+.options{display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px;margin-top:24px}
+.option{
+  padding:18px 20px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);
+  color:#fff;font-size:15px;font-weight:500;cursor:pointer;
+  transition:all .2s;text-align:center;
+}
+.option:hover{border-color:var(--teal-light);background:rgba(13,148,136,.15)}
+.option:active{transform:scale(.98)}
+.option.selected{border-color:var(--teal-light);background:rgba(13,148,136,.25)}
+
+/* Light card option */
+.card-light .option{background:rgba(15,23,42,.04);border-color:rgba(15,23,42,.1);color:var(--navy)}
+.card-light .option:hover{border-color:var(--teal);background:rgba(13,148,136,.08)}
+.card-light .option.selected{border-color:var(--teal);background:rgba(13,148,136,.12)}
+
+/* Theme backgrounds */
+.card-dark{background:linear-gradient(160deg,var(--navy) 0%,#1a2744 100%);color:#fff}
+.card-light{background:var(--cream);color:var(--navy)}
+.card-teal{background:linear-gradient(160deg,var(--teal-dark) 0%,var(--teal) 100%);color:#fff}
+.card-cream{background:linear-gradient(180deg,var(--cream) 0%,var(--cream-dark) 100%);color:var(--navy)}
+
+/* Testimonials */
+.testimonials{display:flex;flex-direction:column;gap:14px;width:100%;max-width:360px;margin-top:16px}
+.testimonial{
+  padding:16px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+}
+.testimonial p{font-size:14px;line-height:1.55;font-style:italic;opacity:.9}
+.testimonial .author{font-size:12px;margin-top:8px;font-weight:600;font-style:normal;opacity:.6}
+
+/* Form */
+.form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.form input{
+  padding:14px 16px;border-radius:var(--radius-sm);
+  border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);
+  color:#fff;font-size:15px;font-family:inherit;outline:none;
+  transition:border-color .2s;
+}
+.form input::placeholder{color:rgba(255,255,255,.4)}
+.form input:focus{border-color:var(--teal-light)}
+.form .privacy{font-size:12px;opacity:.5;text-align:center;margin-top:4px;line-height:1.5}
+
+/* Success animation */
+.success-icon{
+  width:72px;height:72px;border-radius:50%;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.success-icon svg{width:36px;height:36px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@keyframes checkmark{0%{stroke-dashoffset:50}100%{stroke-dashoffset:0}}
+.success-icon svg path{stroke-dasharray:50;stroke-dashoffset:50;animation:checkmark .6s ease .3s forwards}
+
+/* Icon circle */
+.icon-circle{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;font-size:28px;
+}
+.icon-circle.teal{background:rgba(13,148,136,.15)}
+.icon-circle.white{background:rgba(255,255,255,.1)}
+
+/* Who cards */
+.who-grid{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;margin-top:16px}
+.who-card{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+}
+.who-card .emoji{font-size:28px}
+.who-card .text{font-size:14px;line-height:1.4}
+.who-card .text strong{display:block;font-size:15px;margin-bottom:2px}
+
+/* Responsive */
+@media(min-width:640px){
+  .headline{font-size:34px;max-width:440px}
+  .subtext{max-width:400px}
+  .options,.form,.testimonials,.who-grid{max-width:420px}
+}
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+
+<!-- Nav arrows -->
+<button class="nav-arrow left disabled" id="navLeft" onclick="go(-1)">‹</button>
+<button class="nav-arrow right" id="navRight" onclick="go(1)">›</button>
+
+<!-- Dot indicators -->
+<div class="dots" id="dots"></div>
+
+<div class="funnel" id="funnel">
+
+  <!-- CARD 1: Hook -->
+  <div class="card card-dark active" data-card="0">
+    <div class="icon-circle teal">🫁</div>
+    <p class="eyebrow">Airway Clinic · Stockholm</p>
+    <h1 class="headline">Could myofunctional therapy help you or your child?</h1>
+    <p class="subtext">Take this 60-second quiz to find out if tongue, breathing, or muscle patterns may be affecting sleep, health, and development.</p>
+    <div style="margin-top:28px">
+      <button class="btn btn-primary" onclick="go(1)">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- CARD 2: Q1 — Breathing -->
+  <div class="card card-cream" data-card="1">
+    <p class="eyebrow" style="color:var(--teal)">Question 1 of 3</p>
+    <h2 class="headline">How do you (or your child) mainly breathe?</h2>
+    <div class="options">
+      <div class="option" onclick="pick(this)">Through the nose — mostly fine</div>
+      <div class="option" onclick="pick(this)">Mixed — sometimes mouth, sometimes nose</div>
+      <div class="option" onclick="pick(this)">Mostly through the mouth</div>
+    </div>
+  </div>
+
+  <!-- CARD 3: Q2 — Sleep -->
+  <div class="card card-dark" data-card="2">
+    <p class="eyebrow">Question 2 of 3</p>
+    <h2 class="headline">How is your (or your child's) sleep?</h2>
+    <div class="options">
+      <div class="option" onclick="pick(this)">Good — wake up rested</div>
+      <div class="option" onclick="pick(this)">Okay — but sometimes tired</div>
+      <div class="option" onclick="pick(this)">Poor — snoring, restless, or waking tired</div>
+    </div>
+  </div>
+
+  <!-- CARD 4: Q3 — Symptoms -->
+  <div class="card card-light" data-card="3">
+    <p class="eyebrow" style="color:var(--teal)">Question 3 of 3</p>
+    <h2 class="headline">Do any of these sound familiar?</h2>
+    <p class="subtext" style="margin-bottom:20px;opacity:.6">Tap all that apply</p>
+    <div class="options">
+      <div class="option" onclick="toggle(this)">👅 Tongue thrust or improper swallowing</div>
+      <div class="option" onclick="toggle(this)">😴 Mouth breathing, day or night</div>
+      <div class="option" onclick="toggle(this)">🗣️ Speech or articulation difficulties</div>
+      <div class="option" onclick="toggle(this)">😬 Teeth grinding or jaw tension</div>
+      <div class="option" onclick="toggle(this)">👶 Open mouth posture (child)</div>
+    </div>
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" onclick="go(1)">See Results →</button>
+    </div>
+  </div>
+
+  <!-- CARD 5: Results Teaser -->
+  <div class="card card-teal" data-card="4">
+    <div class="icon-circle white">✅</div>
+    <p class="eyebrow" style="opacity:.8">Based on your answers</p>
+    <h2 class="headline">Myofunctional therapy could make a real difference</h2>
+    <p class="subtext">Gentle, targeted exercises can retrain tongue posture, breathing patterns, and facial muscles — improving sleep, focus, and overall health.</p>
+    <div style="margin-top:24px">
+      <button class="btn btn-white" onclick="go(1)">See How It Works →</button>
+    </div>
+  </div>
+
+  <!-- CARD 6: How it works + who it's for -->
+  <div class="card card-dark" data-card="5">
+    <h2 class="headline" style="font-size:24px">How does it work?</h2>
+    <div style="width:100%;max-width:360px;margin:16px 0 24px">
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+        <div style="min-width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">1</div>
+        <p style="font-size:14px;line-height:1.55;opacity:.85"><strong>Assessment</strong> — Jessica Gorlee, our certified myofunctional therapist (OMFT), evaluates breathing, tongue posture, and oral function.</p>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+        <div style="min-width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">2</div>
+        <p style="font-size:14px;line-height:1.55;opacity:.85"><strong>Personalised plan</strong> — Simple daily exercises tailored to your specific needs.</p>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="min-width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">3</div>
+        <p style="font-size:14px;line-height:1.55;opacity:.85"><strong>Lasting results</strong> — Better breathing, better sleep, better health. No medication. No surgery.</p>
+      </div>
+    </div>
+    <button class="btn btn-outline" onclick="go(1)">Continue →</button>
+  </div>
+
+  <!-- CARD 7: Social Proof + Lead Capture -->
+  <div class="card card-dark" data-card="6">
+    <h2 class="headline" style="font-size:22px;margin-bottom:8px">Book a free consultation</h2>
+    <p class="subtext" style="font-size:14px;margin-bottom:16px;opacity:.6">Jessica Gorlee (OMFT) has helped hundreds of patients since 2004. See if myofunctional therapy is right for you.</p>
+
+    <div class="testimonials" style="margin-bottom:16px">
+      <div class="testimonial">
+        <p>"What makes Dr. Sia unique is his holistic approach. He sees the connection between oral health and the rest of the body."</p>
+        <div class="author">— Airway Clinic Patient</div>
+      </div>
+    </div>
+
+    <form class="form" id="leadForm" onsubmit="submitForm(event)">
+      <input type="text" name="firstName" placeholder="First name" required>
+      <input type="text" name="lastName" placeholder="Last name" required>
+      <input type="email" name="email" placeholder="Email address" required>
+      <input type="tel" name="phone" placeholder="Phone number" required>
+      <button type="submit" class="btn btn-primary" style="width:100%">Book My Free Consultation →</button>
+      <p class="privacy">We'll contact you within 24 hours. Your data is safe with us.</p>
+    </form>
+  </div>
+
+  <!-- CARD 8: Thank You -->
+  <div class="card card-teal" data-card="7">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h2 class="headline">You're all set! 🎉</h2>
+    <p class="subtext">We'll be in touch within 24 hours to book your free myofunctional therapy consultation at Airway Clinic Stockholm.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px">
+      <a href="tel:+46812345678" class="btn btn-call">
+        Call now: 08-123 456 78
+        <small>Mon–Fri 09:00–17:00</small>
+      </a>
+      <a href="https://airwayclinic.se" class="btn btn-outline" target="_blank">Visit airwayclinic.se →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const totalCards = 8;
+let current = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let isSwiping = false;
+
+// Init dots
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < totalCards; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dotsEl.appendChild(dot);
+}
+
+function updateUI() {
+  // Cards
+  document.querySelectorAll('.card').forEach((c, i) => {
+    c.classList.remove('active', 'prev');
+    if (i === current) c.classList.add('active');
+    else if (i < current) c.classList.add('prev');
+  });
+  // Progress
+  document.getElementById('progressFill').style.width = ((current + 1) / totalCards * 100) + '%';
+  // Dots
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+  });
+  // Arrows
+  document.getElementById('navLeft').classList.toggle('disabled', current === 0);
+  document.getElementById('navRight').classList.toggle('disabled', current === totalCards - 1);
+}
+
+function go(dir) {
+  const next = current + dir;
+  if (next < 0 || next >= totalCards) return;
+  current = next;
+  updateUI();
+}
+
+// Option tap (single select → advance)
+function pick(el) {
+  el.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(() => go(1), 350);
+}
+
+// Option toggle (multi select, no auto-advance)
+function toggle(el) {
+  el.classList.toggle('selected');
+}
+
+// Touch swipe
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  isSwiping = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (!isSwiping) {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (dx > dy && dx > 10) isSwiping = true;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!isSwiping) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) {
+    go(dx < 0 ? 1 : -1);
+  }
+});
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') go(1);
+  if (e.key === 'ArrowLeft') go(-1);
+});
+
+// Form submit
+function submitForm(e) {
+  e.preventDefault();
+  const form = document.getElementById('leadForm');
+  const data = Object.fromEntries(new FormData(form));
+  data.source = 'myofunctional-quiz';
+  data.quiz_answers = getAnswers();
+  console.log('Lead captured:', data);
+  go(1);
+}
+
+function getAnswers() {
+  const cards = document.querySelectorAll('.card');
+  const answers = {};
+  // Card 1 (index 1): breathing
+  const q1 = cards[1].querySelector('.option.selected');
+  if (q1) answers.breathing = q1.textContent.trim();
+  // Card 2 (index 2): sleep
+  const q2 = cards[2].querySelector('.option.selected');
+  if (q2) answers.sleep = q2.textContent.trim();
+  // Card 3 (index 3): symptoms (multi)
+  const q3 = [...cards[3].querySelectorAll('.option.selected')].map(o => o.textContent.trim());
+  if (q3.length) answers.symptoms = q3;
+  return answers;
+}
+
+updateUI();
+</script>
+</body>
+</html>
