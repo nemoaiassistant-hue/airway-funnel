@@ -43,18 +43,15 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;-
 .nav-arrow{
   position:fixed;top:50%;transform:translateY(-50%);
   width:40px;height:40px;border-radius:50%;
-  background:rgba(255,255,255,.1);backdrop-filter:blur(4px);
-  border:1px solid rgba(255,255,255,.15);
+  background:rgba(15,23,42,.85);border:1px solid rgba(15,23,42,.9);
   color:#fff;font-size:18px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   z-index:90;transition:all .2s;
 }
-.nav-arrow:hover{background:rgba(255,255,255,.2)}
+.nav-arrow:hover{background:rgba(15,23,42,1)}
 .nav-arrow.disabled{opacity:.2;pointer-events:none}
 .nav-arrow.left{left:12px}
 .nav-arrow.right{right:12px}
-.nav-arrow.on-light{background:rgba(15,23,42,.85);border-color:rgba(15,23,42,.9);color:#fff}
-.nav-arrow.on-light:hover{background:rgba(15,23,42,1)}
 
 /* Typography */
 .eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;opacity:.7;margin-bottom:12px}
@@ -341,11 +338,6 @@ function updateUI() {
   // Arrows
   document.getElementById('navLeft').classList.toggle('disabled', current === 0);
   document.getElementById('navRight').classList.toggle('disabled', current === totalCards - 1);
-  // Arrow colour for light backgrounds
-  const activeCard = cards[current];
-  const isLight = activeCard.classList.contains('card-cream') || activeCard.classList.contains('card-light');
-  document.getElementById('navLeft').classList.toggle('on-light', isLight);
-  document.getElementById('navRight').classList.toggle('on-light', isLight);
 }
 
 function go(dir) {
