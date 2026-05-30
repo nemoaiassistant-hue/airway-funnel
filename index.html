@@ -155,6 +155,16 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;-
 .who-card .text{font-size:14px;line-height:1.4}
 .who-card .text strong{display:block;font-size:15px;margin-bottom:2px}
 
+/* Mobile: smaller arrows + padding so text doesn't overlap */
+@media(max-width:639px){
+  .nav-arrow{width:30px;height:30px;font-size:14px}
+  .nav-arrow.left{left:6px}
+  .nav-arrow.right{right:6px}
+  .card{padding:48px 20px 40px}
+  .headline{font-size:24px;max-width:280px}
+  .options,.form,.testimonials,.who-grid{max-width:300px}
+}
+
 /* Responsive */
 @media(min-width:640px){
   .headline{font-size:34px;max-width:440px}
